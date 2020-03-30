@@ -1,0 +1,52 @@
+{
+  "name": "replacer",
+  "productName": "WCD Replacer",
+  "version": "0.1.0",
+  "author": "Forrest Smith",
+  "homepage": "./",
+  "private": true,
+  "main": "public/electron.js",
+  "dependencies": {
+    "@testing-library/jest-dom": "^4.2.4",
+    "@testing-library/react": "^9.4.0",
+    "@testing-library/user-event": "^7.2.1",
+    "react": "^16.12.0",
+    "react-dom": "^16.12.0",
+    "react-router-dom": "^5.1.2",
+    "react-scripts": "3.4.0"
+  },
+  "scripts": {
+    "react-start": "BROWSER=NONE react-scripts start",
+    "electron-start": "DEV=1 electron .",
+    "start": "concurrently 'npm run react-start' 'wait-on http://localhost:3000/ && npm run electron-start .'",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": "react-app"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "bootstrap": "^4.4.1",
+    "concurrently": "^5.1.0",
+    "electron": "^8.0.1",
+    "electron-builder": "^22.3.2",
+    "electron-rebuild": "^1.10.0",
+    "nodegit": "^0.26.5",
+    "python-shell": "^1.0.8",
+    "react-bootstrap": "^1.0.0-beta.16",
+    "wait-on": "^4.0.0"
+  }
+}

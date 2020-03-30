@@ -1,0 +1,1102 @@
+<!-- first only -->
+<!-- first only -->
+<!-- test script -->
+
+<!-- @TemplateContentLayout(templateRegionName:"gid.browse.popup.standard.body.variant.10000725.region1") -->
+<link rel="stylesheet" type="text/css" href="/Asset_Archive/ONWeb/content/0018/361/000/assets/sizeChart.css">
+<link rel="stylesheet" type="text/css" href="/Asset_Archive/ONWeb/content/sizeChartCSS-ONOLCA/sizechart.css" />
+<link rel="stylesheet" type="text/css" href="/Asset_Archive/AllBrands/customerService/legacyCSstyles_ON.css">
+<script type="text/javascript" src="/Asset_Archive/ONWeb/content/0018/361/000/assets/jquery-ui.js"></script>
+<script type="text/javascript" src="/Asset_Archive/ONWeb/content/0018/361/000/assets/iscroll-lite.js"></script>
+<style type="text/css">
+	/* ONOL Specific Styles */
+
+	.shoe_size_table {
+		margin: 1em 0;
+	}
+
+	.women_belt_size_tableHead {
+		width: 30%;
+	}
+
+	.women_belt_size_table_data_wrap,
+	.women_belt_size_table_scroll_wrap {
+		width: 70%;
+	}
+
+	.shoe_size_table_data {
+		width: 100%;
+	}
+
+	/* Language Toggle */
+	#size_chart_language_toggle {
+		padding: 0 1em;
+		text-align: right;
+	}
+
+	#size_chart_language_toggle .active {
+		font-weight: bold;
+	}
+
+	body.popup,
+	#bodyContainer {
+		color: #666;
+		margin: 0;
+		padding: 0;
+		background: #fff;
+		font-family: Verdana, Arial, Sans-serif;
+		font-size: 10px;
+	}
+
+	#sitewide-app,
+	#sitewide-footer {
+		display: none;
+	}
+
+	#bodyContainer #mainContent a,
+	body.order_historyPage a {
+		text-decoration: underline;
+		color: blue;
+	}
+</style>
+<script type="text/javascript">
+	/* checks to see if on preview and adds viewport meta */
+	if (location.hostname.indexOf('wip.gidapps') > -1) {
+		jQuery(document).ready(function () {
+			jQuery('head').prepend('<meta name="viewport" content="width=device-width, initial-scale=1">');
+		});
+	}
+	var jsAssetPath = 'testFolder/GPWeb/content/0012/345/678/assets/'
+	var activeAccordionId = 0;
+	var sizechartNowShowing = {};
+	jQuery.fn.wcdShowSizeChart = {
+		init: function (div, cat) {
+			// hide all category selects and dropdowns
+			jQuery('.categorySelect').hide();
+			// set current division
+			var curDiv = jQuery('li[data-division="' + div + '"]');
+			var curDivName = curDiv.text();
+			jQuery('.currentDivision').text(curDivName);
+			// show division options
+			jQuery('.size_chart_select_wrap[data-parent="' + div + '"]').show();
+
+			// set current category
+			var curCat = jQuery('.size_chart_select_wrap[data-parent="' + div + '"] li[data-category="' + cat + '"]');
+			var curCatName = curCat.text();
+			var curCatData = jQuery(curCat).data('content');
+			var catDropdown = jQuery('.size_chart_select_wrap[data-parent="' + div + '"] .currentCategory');
+			jQuery(catDropdown).text(curCatName);
+			sizechartNowShowing = {
+				'division': div,
+				'category': cat
+			};
+
+			// open appropriate accordions
+			if (div == "womens") {
+				jQuery('.size_chart_intro').hide();
+				if (sizechartVariant == "petite" && cat != "accessories") {
+					activeAccordionId = 1;
+				} else if (sizechartVariant == "tall" & cat != "accessories") {
+					activeAccordionId = 2;
+				} else {
+					activeAccordionId = 0;
+				}
+			} else if (div == "none") {
+				jQuery('.currentDivision').text('Select a Division');
+				jQuery('.size_chart_intro').show();
+			} else {
+				jQuery('.size_chart_intro').hide();
+			}
+			// show size chart data
+			showSizeChartContent(curCatData);
+		}
+	}
+
+	jQuery.fn.wcdSizeChartDropdowns = {
+		// this function makes the dropdowns work
+		isAnimating: false,
+		init: function () {
+			jQuery(function () {
+				// open child dropdown
+				jQuery('.size_chart_select_wrap').on('click', function (e) {
+					if (jQuery(this).hasClass('active') == true) {
+						jQuery('.size_chart_select_wrap').removeClass('active');
+					} else {
+						jQuery('.size_chart_select_wrap').removeClass('active');
+						jQuery(this).toggleClass('active');
+					}
+					var childDropdown = jQuery(this).find('div.sizechartDropdown');
+				});
+				jQuery('.divisionDropdown li').on('click', function (e) {
+					// show child category dropdown
+					var divData = jQuery(this).data('division');
+					var firstCat = jQuery('.size_chart_select_wrap[data-parent="' + divData + '"] li')[0];
+					var firstCatData = jQuery(firstCat).data('category');
+					jQuery.fn.wcdShowSizeChart.init(divData, firstCatData);
+				});
+				jQuery('.categoryDropdown li').on('click', function (e) {
+					// show child category dropdown
+					var parentData = sizechartNowShowing.division;
+					var catData = jQuery(this).data('category');
+					jQuery.fn.wcdShowSizeChart.init(parentData, catData);
+				});
+				window.addEventListener("orientationchange", function () {
+					// check to see if content is loaded in dropdowns
+					if (jQuery.isEmptyObject(sizechartNowShowing) == true) {
+						jQuery.fn.wcdShowSizeChart.init(sizechartDropdownData.division, sizechartDropdownData.category);
+					} else {
+						jQuery.fn.wcdShowSizeChart.init(sizechartNowShowing.division, sizechartNowShowing.category);
+					}
+				}, false);
+				// set initial dropdowns and content
+				jQuery.fn.wcdShowSizeChart.init(sizechartDropdownData.division, sizechartDropdownData.category);
+			});
+		}
+	}
+
+	jQuery.fn.wcdSizeChartDropdowns.init();
+
+	var sizeChartPath = '/Asset_Archive/ONWeb/content/0018/361/000/assets/';
+
+	var showSizeChartContent = function (dataURL) {
+		var ajaxData = "";
+		var sizeChartData = jQuery.ajax({
+			type: 'GET',
+			url: sizeChartPath + dataURL,
+			async: false,
+			jsonpCallback: 'jsonCallback',
+			contentType: 'application/json',
+			dataType: 'jsonp',
+			success: function (json) {
+				ajaxData = json.sizeChartCategoryDataInfo[1];
+				// check to see if browser window is large enough
+				if (clientBrowser != undefined) {
+					// check to see if IE 9 or below
+					if (clientBrowser.isIE == true && clientBrowser.isIE10Up == false) {
+						if (jQuery(window).width() < 768) {
+							buildLargeSizeChartContentFromData(ajaxData);
+						} else {
+							buildSmallSizeChartContentFromData(ajaxData);
+						}
+					} else {
+						if (window.matchMedia("(min-width: 768px)").matches) {
+							buildLargeSizeChartContentFromData(ajaxData);
+						} else {
+							buildSmallSizeChartContentFromData(ajaxData);
+						}
+					}
+				} else {
+					if (jQuery(window).width() < 768) {
+						buildLargeSizeChartContentFromData(ajaxData);
+					} else {
+						buildSmallSizeChartContentFromData(ajaxData);
+					}
+				}
+			},
+			error: function (e) {
+				console.info(e.message);
+			}
+		});
+	}
+
+	var buildLargeSizeChartContentFromData = function (data) {
+		if (data != "") {
+			var dataContainer = jQuery('#size_chart_data_container');
+			dataContainer.html('');
+			for (var i = 0; i < data.sections.length; i++) {
+				var sectionName = data.sections[i].section;
+				var sectionClass = data.sections[i].elementClass;
+				dataContainer.append('<h2 class="heading-c">' + sectionName + '</h2>');
+				dataContainer.append('<div class="' + sectionClass + ' chartSection"></div>');
+				if (sectionName == 'SIZE CHARTS') {
+					buildLargeSizeChart(dataContainer, sectionClass, data, i);
+				} else if (sectionName == 'MEASURING TIPS') {
+					buildMeasuringTips(dataContainer, sectionClass, data, i);
+				}
+			}
+		}
+	}
+	var buildSmallSizeChartContentFromData = function (data) {
+		if (data != "") {
+			var dataContainer = jQuery('#size_chart_data_container');
+			dataContainer.html('');
+			for (var i = 0; i < data.sections.length; i++) {
+				var sectionName = data.sections[i].section;
+				var sectionClass = data.sections[i].elementClass;
+				dataContainer.append('<h2 class="heading-c">' + sectionName + '</h2>');
+				dataContainer.append('<div class="' + sectionClass + ' chartSection"></div>');
+				if (sectionName == 'SIZE CHARTS') {
+					buildSmallSizeChart(dataContainer, sectionClass, data, i);
+				} else if (sectionName == 'MEASURING TIPS') {
+					buildMeasuringTips(dataContainer, sectionClass, data, i);
+				}
+			}
+		}
+	}
+	/* SIZE CHART TABLES */
+	var buildLargeSizeChart = function (dataContainer, sectionClass, data, i) {
+		if (data.intro != undefined) {
+			jQuery("." + sectionClass).append('<div class="sizeChartIntro"></div>');
+			jQuery(".sizeChartIntro").html(data.intro);
+		}
+		// build inches/cm toggle
+		jQuery("." + sectionClass).append('<div class="measurement_toggle"></div>');
+		jQuery("." + sectionClass).append('<div class="measurement_single">All sizes displayed in inches</div>');
+		jQuery(".measurement_toggle").append('<div class="inches_btn heading-c g-1-2 active">INCHES</div>');
+		jQuery(".measurement_toggle").append('<div class="cm_btn g-1-2 heading-c">CENTIMETERS</div>');
+		jQuery("." + sectionClass).append('<div class="online_highlight" style="display: none;"></div>');
+		jQuery(".online_highlight").append('<div class="online_exclusive g-1-2">* Blue highlight indicates online exclusive size.</div>');
+		jQuery("." + sectionClass).append('<div class="size_chart_accordion"></div>');
+		// build tables
+		var tables = data.sections[i].tables;
+		if (tables != undefined) {
+			for (var j = 0; j < tables.length; j++) {
+				var table = tables[j].table;
+				var tableClass = tables[j].elementClass;
+				var tableWrap = tableClass + '_data';
+				jQuery("." + sectionClass + " .size_chart_accordion").append('<h3 class="' + tableClass + '_heading heading-d">' + table + '</h3>');
+				jQuery("." + sectionClass + " .size_chart_accordion").append('<div class="' + tableClass + ' chartTable"></div>');
+				jQuery("." + tableClass).append('<div class="' + tableClass + 'Head tableHead"></div>');
+				jQuery("." + tableClass).append('<div class="' + tableWrap + '_wrap  tableWrap"><div class="' + tableWrap + '"></div></div>');
+				jQuery("." + tableClass + "Head").append('<div id="' + tableClass + 'Master0" class="cell">&nbsp;</div>');
+
+				// exclude borders on last accordion
+				if ((j + 1) == tables.length) {
+					jQuery("." + tableClass + "_heading").addClass('lastAccordion');
+					jQuery("." + tableClass).addClass('lastAccordion');
+				}
+
+				// set up the alpha sizes columns
+				var sizes = tables[j].tableContent[0];
+				var dupcheck = "";
+				var dupcount = 1;
+				if (sizes.segmentContent[0].row == 'alpha') {
+					var colCount = sizes.segmentContent[0].cells.length;
+
+					for (var k = 0; k < colCount; k++) {
+						var alphaSize = sizes.segmentContent[0].cells[k].cell;
+						if (alphaSize != dupcheck) {
+							dupcheck = alphaSize;
+							// set duplicate classes
+							if (dupcount == 1) {
+								var colSize = 'singleCol';
+							} else if (dupcount == 2) {
+								var colSize = 'doubleCol';
+							} else if (dupcount == 3) {
+								var colSize = 'tripleCol';
+							} else if (dupcount == 4) {
+								var colSize = 'quadCol';
+							} else {
+								var colSize = 'oversizeCol';
+							}
+
+							// set total column widths
+							var totalCol = 'colWidth' + colCount;
+
+							if (colSize != 'singleCol') {
+								var lastCol = jQuery("." + tableWrap).children().last();
+								jQuery(lastCol).addClass(colSize);
+								jQuery(lastCol).removeClass('singleCol');
+							}
+							jQuery("." + tableWrap).append('<div class="chartColumn singleCol ' + totalCol + ' c' + k + '"><div class="cell alpha ' + tableClass + 'Master0"><div class="cellText"><span>' + alphaSize + '</span></div></div></div>');
+							dupcount = 1;
+						} else if ((k + 1) == colCount) {
+							if (dupcount == 1) {
+								colSize = 'doubleCol';
+							} else if (dupcount == 2) {
+								colSize = 'tripleCol';
+							}
+							if (colSize != 'singleCol') {
+								var lastCol = jQuery("." + tableWrap).children().last();
+								jQuery(lastCol).addClass(colSize);
+								jQuery(lastCol).removeClass('singleCol');
+							}
+						} else {
+							dupcount++;
+						}
+
+					}
+				}
+				// set up the num cells
+				if (sizes.segmentContent[1].row == 'num') {
+					var colCount = sizes.segmentContent[1].cells.length;
+					var hasNum = 'false';
+					jQuery("." + tableClass + "Head").append('<div id="' + tableClass + 'MasterNum" class="cell"><div class="cellText"><span>Size</span></div></div>');
+
+					for (var k = 0; k < colCount; k++) {
+						var cellData = sizes.segmentContent[1].cells[k].cell;
+						var cellParent = jQuery("." + tableWrap + " .c" + k);
+
+						// add inner columns if alpha columns are wide
+						if (cellParent.length > 0) {
+							if (cellParent.hasClass('doubleCol')) {
+								cellParent.append('<div class="colWidth2 innerCol c' + k + '"></div>');
+								cellParent.append('<div class="colWidth2 innerCol c' + (k + 1) + '"></div>');
+								cellParent.removeClass('c' + k);
+							}
+							if (cellParent.hasClass('tripleCol')) {
+								cellParent.append('<div class="colWidth3 innerCol c' + k + '"></div>');
+								cellParent.append('<div class="colWidth3 innerCol c' + (k + 1) + '"></div>');
+								cellParent.append('<div class="colWidth3 innerCol c' + (k + 2) + '"></div>');
+								cellParent.removeClass('c' + k);
+							}
+							if (cellParent.hasClass('quadCol')) {
+								cellParent.append('<div class="colWidth4 innerCol c' + k + '"></div>');
+								cellParent.append('<div class="colWidth4 innerCol c' + (k + 1) + '"></div>');
+								cellParent.append('<div class="colWidth4 innerCol c' + (k + 2) + '"></div>');
+								cellParent.append('<div class="colWidth4 innerCol c' + (k + 3) + '"></div>');
+								cellParent.removeClass('c' + k);
+							}
+						}
+
+						if (cellData.indexOf('*') != -1) {
+							jQuery('.online_highlight').css({ 'display': 'block' });
+							hasNum = 'true';
+							cellData = cellData.replace('*', '');
+							jQuery("." + tableWrap + " .c" + k).append('<div class="cell online_exclusive num_unit ' + tableClass + 'MasterNum"><div class="cellText"><span>' + cellData + '</span></div></div>');
+						} else if (cellData != "") {
+							hasNum = 'true';
+							jQuery("." + tableWrap + " .c" + k).append('<div class="cell num_unit ' + tableClass + 'MasterNum"><div class="cellText"><span>' + cellData + '</span></div></div>');
+						} else {
+							jQuery("." + tableWrap + " .c" + k).append('<div class="cell num_unit ' + tableClass + 'MasterNum"><div class="cellText"><span>&nbsp;</span></div></div>');
+						}
+					}
+					// if all cells are empty, hide num rows
+					if (hasNum == 'false') {
+						jQuery('#' + tableClass + 'MasterNum').hide();
+						jQuery('.' + tableClass + 'MasterNum').hide();
+					}
+				}
+				// get all of the remaining fields
+				for (var k = 1; k < tables[j].tableContent.length; k++) {
+					var segCont = tables[j].tableContent[k].segmentContent;
+					var segName = tables[j].tableContent[k].segment;
+					jQuery("." + tableClass + "Head").append('<div class="cell" id="' + tableClass + 'Master' + k + '"><div class="cellText"><span>' + segName + '</span></div></div>');
+					for (var l = 0; l < segCont.length; l++) {
+						for (var m = 0; m < segCont[l].cells.length; m++) {
+							var measurement = segCont[l].row;
+							var cellData = segCont[l].cells[m].cell;
+							if (cellData.indexOf('*') != -1) {
+								jQuery('.online_highlight').css({ 'display': 'block' });
+								cellData = cellData.replace('*', '');
+								jQuery("." + tableWrap + " .c" + m).append('<div class="cell online_exclusive ' + measurement + '_unit ' + tableClass + 'Master' + k + '"><div class="cellText"><span>' + cellData + '</span></div></div>');
+							} else if (cellData != "") {
+								jQuery("." + tableWrap + " .c" + m).append('<div class="cell ' + measurement + '_unit ' + tableClass + 'Master' + k + '"><div class="cellText"><span>' + cellData + '</span></div></div>');
+
+							} else {
+								jQuery("." + tableWrap + " .c" + m).append('<div class="cell ' + measurement + '_unit ' + tableClass + 'Master' + k + '"><div class="cellText"><span>&nbsp;</span></div></div>');
+							}
+
+						}
+					}
+				}
+				var legends = tables[j].legends;
+				if (legends != undefined) {
+					jQuery("." + tableClass).append('<div class="' + tableClass + '_legend table_legend"></div>');
+					var legendWrap = jQuery('.' + tableClass + '_legend');
+					for (var n = 0; n < legends.length; n++) {
+						var legendDesc = legends[n].desc;
+						legendWrap.append('<p class="legend_desc body-a">' + legendDesc + '</p>');
+					}
+				}
+				// check size to add in iscroll functionality
+				var sizes = tables[j].tableContent[0].segmentContent[0].cells;
+				var colCount = sizes.length;
+				var realCol = colCount + 1;
+				if (realCol > 10) {
+					var scrollTableWrap = "." + tableWrap + "_wrap";
+					var scrollTable = "." + tableWrap;
+					var scrollWidth = 'overSizeScroll' + realCol;
+					jQuery(scrollTableWrap).addClass('overSizeChart');
+					jQuery(scrollTable).addClass(scrollWidth);
+
+					setIscroll(scrollTableWrap);
+				}
+			}
+			jQuery('.tableHead .cell').each(function () {
+				var masterId = jQuery(this).attr('id');
+				setCellHeight(masterId, masterId);
+			});
+
+			jQuery('.cellText').each(function (e) {
+				var wrap = jQuery(this);
+				setCellTextMargin(wrap);
+			});
+			if (jQuery('.cm_unit').length != 0) {
+				jQuery('.cm_unit').addClass('chartHide');
+				jQuery('.inches_btn').click(function () {
+					jQuery('.inches_btn').addClass('active');
+					jQuery('.cm_btn').removeClass('active');
+					jQuery('.inches_unit').removeClass('chartHide');
+					jQuery('.cm_unit').addClass('chartHide');
+				});
+				jQuery('.cm_btn').click(function () {
+					jQuery('.cm_btn').addClass('active');
+					jQuery('.inches_btn').removeClass('active');
+					jQuery('.cm_unit').removeClass('chartHide');
+					jQuery('.inches_unit').addClass('chartHide');
+				});
+			} else {
+				jQuery('.measurement_toggle').hide();
+				jQuery('.measurement_single').show();
+			}
+			jQuery('.size_chart_accordion').accordion({
+				heightStyle: "content",
+				collapsible: true,
+				active: activeAccordionId,
+				icons: { "header": "icon-plus", "activeHeader": "icon-minus" },
+				beforeActivate: function (event, ui) {
+					// The accordion believes a panel is being opened
+					if (ui.newHeader[0]) {
+						var currHeader = ui.newHeader;
+						var currContent = currHeader.next('.ui-accordion-content');
+						// The accordion believes a panel is being closed
+					} else {
+						var currHeader = ui.oldHeader;
+						var currContent = currHeader.next('.ui-accordion-content');
+					}
+					// Since we've changed the default behavior, this detects the actual status
+					var isPanelSelected = currHeader.attr('aria-selected') == 'true';
+
+					// Toggle the panel's header
+					currHeader.toggleClass('ui-corner-all', isPanelSelected).toggleClass('accordion-header-active ui-state-active ui-corner-top', !isPanelSelected).attr('aria-selected', ((!isPanelSelected).toString()));
+
+					// Toggle the panel's icon
+					currHeader.children('.ui-icon').toggleClass('icon-plus', isPanelSelected).toggleClass('icon-minus', !isPanelSelected);
+
+					// Toggle the panel's content
+					currContent.toggleClass('accordion-content-active', !isPanelSelected)
+					if (isPanelSelected) { currContent.slideUp(); } else { currContent.slideDown(); }
+
+					return false; // Cancel the default action
+				}
+			});
+		}
+	}
+	var buildSmallSizeChart = function (dataContainer, sectionClass, data, i) {
+		if (data.intro != undefined) {
+			jQuery("." + sectionClass).append('<div class="sizeChartIntro body-a"></div>');
+			jQuery(".sizeChartIntro").html(data.intro);
+		}
+		// build inches/cm toggle
+		jQuery("." + sectionClass).append('<div class="measurement_toggle"></div>');
+		jQuery("." + sectionClass).append('<div class="measurement_single">All sizes displayed in inches</div>');
+		jQuery(".measurement_toggle").append('<div class="inches_btn heading-c g-1-2 active">INCHES</div>');
+		jQuery(".measurement_toggle").append('<div class="cm_btn g-1-2 heading-c">CENTIMETERS</div>');
+		jQuery("." + sectionClass).append('<div class="online_highlight" style="display: none;"></div>');
+		jQuery(".online_highlight").append('<div class="online_exclusive g-1-1">* Blue highlight indicates online exclusive size.</div>');
+		jQuery("." + sectionClass).append('<div class="size_chart_accordion mobile_axis"></div>');
+		// build tables
+		var tables = data.sections[i].tables;
+		if (tables != undefined) {
+			for (var j = 0; j < tables.length; j++) {
+				var table = tables[j].table;
+				var tableClass = tables[j].elementClass;
+				var tableWrap = tableClass + '_data';
+				jQuery("." + sectionClass + " .size_chart_accordion").append('<h3 class="' + tableClass + '_heading heading-d">' + table + '</h3>');
+				jQuery("." + sectionClass + " .size_chart_accordion").append('<div class="' + tableClass + '_wrap"><div class="' + tableClass + ' chartTable"></div></div>');
+				// exclude borders on last accordion
+				if ((j + 1) == tables.length) {
+					jQuery("." + tableClass + "_heading").addClass('lastAccordion');
+					jQuery("." + tableClass + "_wrap").addClass('lastAccordion');
+				}
+				var sizes = tables[j].tableContent;
+				var colCount = sizes.length;
+				var numCol = 0;
+
+				var hasNum = 'false';
+				var headArray = [];
+				for (var k = 0; k < colCount; k++) {
+					var segName = sizes[k].segment;
+					if (segName == 'SIZE' || segName == 'SIZE/WAIST' || segName == 'SIZE (mm)') {
+						jQuery("." + tableClass).append('<div class="' + tableClass + 'Head tableHead colWidth' + colCount + '"></div>');
+						jQuery("." + tableClass).append('<div class="' + tableClass + '_scroll_wrap mobile_scroll_wrap' + colCount + '"></div>');
+						jQuery("." + tableClass + "_scroll_wrap").append('<div class="' + tableClass + '_scroll_content"></div>');
+						jQuery("." + tableClass + "_scroll_content").append('<div class="chartColumn num_unit singleCol colWidth' + colCount + ' cNum"><div class="cell ' + tableClass + 'MasterHead topRow"><div class="cellText"><span>SIZE</span></div></div></div>');
+						jQuery("." + tableClass + "Head").append('<div id="' + tableClass + 'MasterHead" class="cell topRow"><div class="cellText"><span>&nbsp;</span></div></div>');
+						for (var l = 0; l < sizes[k].segmentContent.length; l++) {
+							var segCol = sizes[k].segmentContent[l].cells;
+							var dupcheck = "";
+							var rowSize = "singleRow";
+							var dupcount = 1;
+							var tempRow = "";
+							var curHead = "";
+							for (var m = 0; m < segCol.length; m++) {
+								// alpha rows
+								if (sizes[k].segmentContent[l].row == 'alpha') {
+									var cellData = segCol[m].cell;
+									if (dupcheck != cellData) {
+										dupcheck = cellData;
+										jQuery("." + tableClass + "Head").append('<div id="' + tableClass + 'RowWrap' + m + '" class="cellRow masterRow"></div>');
+										tempRow = jQuery("#" + tableClass + "RowWrap" + m);
+										tempRow.append('<div id="' + tableClass + 'Master' + m + '" class="cell singleRow"><div class="cellText"><span>' + cellData + '</span></div></div>');
+										curHead = m;
+										dupcount = 1;
+									} else {
+										dupcount++;
+										var curRow = jQuery(tempRow).children('div.cell');
+										if (dupcount == 2) {
+											curRow.removeClass('singleRow');
+											curRow.addClass('doubleRow');
+										} else if (dupcount == 3) {
+											curRow.removeClass('doubleRow');
+											curRow.addClass('tripleRow');
+										} else if (dupcount == 4) {
+											curRow.removeClass('tripleRow');
+											curRow.addClass('quadRow');
+										}
+									}
+									// insert into headArray
+									var headObj = { 'val': m, 'par': curHead };
+									headArray.push(headObj);
+
+									// num rows
+								} else if (sizes[k].segmentContent[l].row == 'num') {
+									var cellData = segCol[m].cell;
+									var placeResult = headArray.filter(function (obj) {
+										return obj.val == m;
+									});
+									if (placeResult[0].val == placeResult[0].par) {
+										// add new cellRow div
+										jQuery("." + tableClass + " .num_unit").append('<div class="cellRow rowWrap' + tableClass + placeResult[0].par + '"></div>');
+										// insert cell
+										if (cellData.indexOf('*') != -1) {
+											jQuery('.online_highlight').css({ 'display': 'block' });
+											cellData = cellData.replace('*', '');
+											hasNum = 'true';
+											jQuery("." + tableClass + " .num_unit .rowWrap" + tableClass + placeResult[0].par).append('<div class="' + tableClass + 'Master' + m + ' cell online_exclusive"><div class="cellText"><span>' + cellData + '</span></div></div>');
+										} else if (cellData != "") {
+											hasNum = 'true';
+											jQuery("." + tableClass + " .num_unit .rowWrap" + tableClass + placeResult[0].par).append('<div class="' + tableClass + 'Master' + m + ' cell"><div class="cellText"><span>' + cellData + '</span></div></div>');
+										} else {
+											jQuery("." + tableClass + " .num_unit .rowWrap" + tableClass + placeResult[0].par).append('<div class="' + tableClass + 'Master' + m + ' cell"><div class="cellText"><span>&nbsp;</span></div></div>');
+										}
+									} else {
+										//insert cell in previous div
+										if (cellData.indexOf('*') != -1) {
+											jQuery('.online_highlight').css({ 'display': 'block' });
+											cellData = cellData.replace('*', '');
+											hasNum = 'true';
+											jQuery("." + tableClass + " .num_unit .rowWrap" + tableClass + placeResult[0].par).append('<div class="' + tableClass + 'Master' + m + ' cell online_exclusive"><div class="cellText"><span>' + cellData + '</span></div></div>');
+										} else if (cellData != "") {
+											hasNum = 'true';
+											jQuery("." + tableClass + " .num_unit .rowWrap" + tableClass + placeResult[0].par).append('<div class="' + tableClass + 'Master' + m + ' cell"><div class="cellText"><span>' + cellData + '</span></div></div>');
+										} else {
+											jQuery("." + tableClass + " .num_unit .rowWrap" + tableClass + placeResult[0].par).append('<div class="' + tableClass + 'Master' + m + ' cell"><div class="cellText"><span>&nbsp;</span></div></div>');
+										}
+									}
+
+								}
+							}
+						}
+						// if all num cells are empty, hide num col
+						// and revise column widths
+						if (hasNum == 'false') {
+							jQuery('.' + tableClass + ' .num_unit').hide();
+
+							numCol = colCount - 1;
+						} else {
+							numCol = colCount;
+						}
+					} else {
+						for (var l = 0; l < sizes[k].segmentContent.length; l++) {
+							// inches rows
+							if (sizes[k].segmentContent[l].row == 'inches') {
+								var unit_type = 'inches';
+								// cm rows
+							} else if (sizes[k].segmentContent[l].row == 'cm') {
+								var unit_type = 'cm';
+								// other rows
+							} else {
+								var unit_type = 'other';
+							}
+							if (k == colCount - 1) {
+								var chartLastCol = ' last';
+							} else {
+								var chartLastCol = '';
+							}
+							jQuery("." + tableClass + "_scroll_content").append('<div class="chartColumn ' + unit_type + '_unit singleCol colWidth' + numCol + ' c' + k + chartLastCol + '"><div class="cell ' + tableClass + 'MasterHead topRow"><div class="cellText"><span>' + segName + '</span></div></div></div>');
+							var segCol = sizes[k].segmentContent[l].cells;
+							for (var m = 0; m < segCol.length; m++) {
+								var cellData = segCol[m].cell;
+								var placeResult = headArray.filter(function (obj) {
+									return obj.val == m;
+								});
+								if (placeResult[0].val == placeResult[0].par) {
+									// add new cellRow div
+									jQuery("." + tableClass + " ." + unit_type + "_unit.c" + k).append('<div class="cellRow rowWrap' + tableClass + placeResult[0].par + '"></div>');
+									// insert cell
+
+									if (cellData.indexOf('*') != -1) {
+										jQuery('.online_highlight').css({ 'display': 'block' });
+										cellData = cellData.replace('*', '');
+										jQuery("." + tableClass + " ." + unit_type + "_unit.c" + k + " .rowWrap" + tableClass + placeResult[0].par).append('<div class="' + tableClass + 'Master' + m + ' online_exclusive cell"><div class="cellText"><span>' + cellData + '</span></div></div>');
+									} else if (cellData != "") {
+										jQuery("." + tableClass + " ." + unit_type + "_unit.c" + k + " .rowWrap" + tableClass + placeResult[0].par).append('<div class="' + tableClass + 'Master' + m + ' cell"><div class="cellText"><span>' + cellData + '</span></div></div>');
+									} else {
+										jQuery("." + tableClass + " ." + unit_type + "_unit.c" + k + " .rowWrap" + tableClass + placeResult[0].par).append('<div class="' + tableClass + 'Master' + m + ' cell"><div class="cellText"><span>&nbsp;</span></div></div>');
+									}
+								} else {
+									//insert cell in previous div
+
+									if (cellData.indexOf('*') != -1) {
+										jQuery('.online_highlight').css({ 'display': 'block' });
+										cellData = cellData.replace('*', '');
+										jQuery("." + tableClass + " ." + unit_type + "_unit.c" + k + " .rowWrap" + tableClass + placeResult[0].par).append('<div class="' + tableClass + 'Master' + m + ' cell online_exclusive"><div class="cellText"><span>' + cellData + '</span></div></div>');
+									} else if (cellData != "") {
+										jQuery("." + tableClass + " ." + unit_type + "_unit.c" + k + " .rowWrap" + tableClass + placeResult[0].par).append('<div class="' + tableClass + 'Master' + m + ' cell"><div class="cellText"><span>' + cellData + '</span></div></div>');
+									} else {
+										jQuery("." + tableClass + " ." + unit_type + "_unit.c" + k + " .rowWrap" + tableClass + placeResult[0].par).append('<div class="' + tableClass + 'Master' + m + ' cell"><div class="cellText"><span>&nbsp;</span></div></div>');
+									}
+								}
+							}
+						}
+					}
+				}
+
+				var scrollTableWrap = "." + tableClass + "_scroll_wrap";
+				var scrollTable = "." + tableClass + "_scroll_content";
+				var scrollWidth = 'scrollWide' + colCount;
+				jQuery(scrollTableWrap).addClass('scrollChart');
+				jQuery(scrollTable).addClass(scrollWidth);
+				if (colCount > 3) {
+					mobileIscroll("." + tableClass + "_scroll_wrap");
+				}
+				jQuery('.' + tableClass + ' .tableHead .cell').each(function () {
+					var masterId = jQuery(this).attr('id');
+					if (jQuery(this).hasClass('doubleRow') == true || jQuery(this).hasClass('tripleRow') == true || jQuery(this).hasClass('quadRow') == true) {
+						setCellHeight(masterId, masterId);
+						var curMasterSuffix = masterId.match(/\d+/);
+						var newMasterSuffix = parseInt(curMasterSuffix[0]) + 1;
+						var newMasterId = masterId.replace(/\d+/g, '') + newMasterSuffix;
+						setCellHeight(masterId, newMasterId);
+					} else {
+						setCellHeight(masterId, masterId);
+					}
+				});
+				var legends = tables[j].legends;
+				if (legends != undefined) {
+					jQuery("." + tableClass).append('<div class="' + tableClass + '_legend table_legend"></div>');
+					var legendWrap = jQuery('.' + tableClass + '_legend');
+					for (var n = 0; n < legends.length; n++) {
+						var legendDesc = legends[n].desc;
+						legendWrap.append('<p class="legend_desc body-a">' + legendDesc + '</p>');
+					}
+				}
+			}
+			jQuery('.cellText').each(function (e) {
+				var wrap = jQuery(this);
+				setCellTextMargin(wrap);
+			});
+			if (jQuery('.cm_unit').length != 0) {
+				jQuery('.cm_unit').addClass('chartHide');
+				jQuery('.inches_btn').click(function () {
+					jQuery('.inches_btn').addClass('active');
+					jQuery('.cm_btn').removeClass('active');
+					jQuery('.inches_unit').removeClass('chartHide');
+					jQuery('.cm_unit').addClass('chartHide');
+				});
+				jQuery('.cm_btn').click(function () {
+					jQuery('.cm_btn').addClass('active');
+					jQuery('.inches_btn').removeClass('active');
+					jQuery('.cm_unit').removeClass('chartHide');
+					jQuery('.inches_unit').addClass('chartHide');
+				});
+			} else {
+				jQuery('.measurement_toggle').hide();
+				jQuery('.measurement_single').show();
+			}
+			jQuery('.size_chart_accordion').accordion({
+				heightStyle: "content",
+				collapsible: true,
+				active: activeAccordionId,
+				icons: { "header": "icon-plus", "activeHeader": "icon-minus" },
+				beforeActivate: function (event, ui) {
+					// The accordion believes a panel is being opened
+					if (ui.newHeader[0]) {
+						var currHeader = ui.newHeader;
+						var currContent = currHeader.next('.ui-accordion-content');
+						// The accordion believes a panel is being closed
+					} else {
+						var currHeader = ui.oldHeader;
+						var currContent = currHeader.next('.ui-accordion-content');
+					}
+					// Since we've changed the default behavior, this detects the actual status
+					var isPanelSelected = currHeader.attr('aria-selected') == 'true';
+
+					// Toggle the panel's header
+					currHeader.toggleClass('ui-corner-all', isPanelSelected).toggleClass('accordion-header-active ui-state-active ui-corner-top', !isPanelSelected).attr('aria-selected', ((!isPanelSelected).toString()));
+
+					// Toggle the panel's icon
+					currHeader.children('.ui-icon').toggleClass('icon-plus', isPanelSelected).toggleClass('icon-minus', !isPanelSelected);
+
+					// Toggle the panel's content
+					currContent.toggleClass('accordion-content-active', !isPanelSelected)
+					if (isPanelSelected) { currContent.slideUp(); } else { currContent.slideDown(); }
+
+					return false; // Cancel the default action
+				}
+			});
+		}
+	}
+	/* MEASURING TIPS */
+	var buildMeasuringTips = function (dataContainer, sectionClass, data, i) {
+		var header = data.sections[i].header;
+		var subhead = data.sections[i].subhead;
+		var sectionImage = data.sections[i].image_url;
+		var sectionHDImage = data.sections[i].hd_image_url;
+		var contents = data.sections[i].contents;
+		jQuery("." + sectionClass).append('<h4 class="section_header heading-d">' + header + '</h4>');
+		jQuery("." + sectionClass).append('<p class="section_subhead body-a">' + subhead + '</p>');
+		if (contents != undefined) {
+			jQuery("." + sectionClass).append('<div class="section_content_wrap grid-root"></div>');
+			var contentWrap = "." + sectionClass + " .section_content_wrap";
+			jQuery(contentWrap).append('<div class="section_item_wrap g-1-1"></div>');
+			var itemWrap = "." + sectionClass + " .section_item_wrap";
+			for (var j = 0; j < contents.length; j++) {
+				var contentTitle = contents[j].title;
+				var contentDesc = contents[j].desc;
+				jQuery(itemWrap).append('<div class="section_item item' + j + '"></div>');
+				jQuery(".item" + j).append('<h4 class="item_title heading-d">' + contentTitle + '</h4>');
+				jQuery(".item" + j).append('<p class="item_desc body-a">' + contentDesc + '</p>');
+			}
+			if (sectionImage != "") {
+				jQuery(itemWrap).addClass('g-lg-1-2');
+				if (sectionHDImage != "") {
+					jQuery(contentWrap).append('<div class="section_image_wrap g-lg-1-2"><img src="' + sizeChartPath + 'images/' + sectionImage + '" srcset="' + sizeChartPath + 'images/' + sectionImage + ' 1x, ' + sizeChartPath + 'images/' + sectionHDImage + ' 2x"></div>');
+				} else {
+					jQuery(contentWrap).append('<div class="section_image_wrap g-lg-1-2"><img src="' + sizeChartPath + 'images/' + sectionImage + '"></div>');
+				}
+
+			}
+		}
+	}
+	/* set vertical cell spacing */
+	var setCellTextMargin = function (wrap) {
+		var textWrap = jQuery(wrap);
+		var textHeight = textWrap.height();
+		var cellParent = textWrap.parent();
+		var parentHeight = jQuery(cellParent).height();
+		var cellDiff = parentHeight - textHeight;
+		var verticalMargin = (cellDiff / 2) + 'px';
+		textWrap.css({
+			'margin-top': verticalMargin,
+			'margin-bottom': verticalMargin
+		});
+	};
+	/* set table cell heights */
+	var setCellHeight = function (cellId, cellClass) {
+		var maxHeight = 0;
+		var cellHead = jQuery('#' + cellId);
+		var cells = jQuery('.' + cellClass);
+		cells.each(function () {
+			var spanWrap = jQuery(this).children('div');
+			var span = jQuery(spanWrap).children('span');
+			var spanHeight = jQuery(span).height();
+			if (spanHeight != 0) {
+				jQuery(spanWrap).css({
+					'height': spanHeight
+				});
+			}
+			if (jQuery(this).outerHeight() > maxHeight) {
+				maxHeight = jQuery(this).outerHeight();
+			}
+		});
+		if (cellHead.outerHeight() > maxHeight && cellId == cellClass) {
+			maxHeight = cellHead.outerHeight();
+		}
+		if (cellHead.hasClass('doubleRow') == true && cellId == cellClass) {
+			var doubleHeight = maxHeight * 2;
+			cellHead.css({ 'height': doubleHeight + 'px' });
+		} else if (cellHead.hasClass('doubleRow') == true && cellId != cellClass || cellHead.hasClass('tripleRow') == true && cellId != cellClass || cellHead.hasClass('quadRow') == true && cellId != cellClass) {
+			//cellHead.css({'height': maxHeight + 'px'});
+		} else if (cellHead.hasClass('tripleRow') == true && cellId == cellClass) {
+			var tripleHeight = maxHeight * 3;
+			cellHead.css({ 'height': tripleHeight + 'px' });
+		} else if (cellHead.hasClass('quadRow') == true && cellId == cellClass) {
+			var tripleHeight = maxHeight * 4;
+			cellHead.css({ 'height': tripleHeight + 'px' });
+		} else {
+			cellHead.css({ 'height': maxHeight + 'px' });
+		}
+		cells.css({ 'height': maxHeight + 'px' });
+	}
+
+	var setIscroll = function (scrollParent) {
+		new IScroll(scrollParent, {
+			mouseWheel: true,
+			scrollbars: true,
+			scrollX: true,
+			scrollY: false,
+			interactiveScrollbars: true
+		});
+	}
+
+	var mobileIscroll = function (scrollParent) {
+		new IScroll(scrollParent, {
+			mouseWheel: false,
+			scrollbars: true,
+			scrollX: true,
+			scrollY: false,
+			interactiveScrollbars: true
+		});
+	}
+
+	const toggleLocale = newLocale => {
+		return window.location.replace(window.location.toString().replace('en_CA', newLocale));
+	}
+</script>
+
+<div id="size_chart_content" class="onesite">
+	<div id="size_chart_language_toggle">
+		<span class="active">English</span> | <a href="javascript:toggleLocale('fr_CA');">Français</a>
+	</div>
+	<div class="size_chart_intro" style="display:none">
+		<h3 class="heading-d"></h3>
+		<p class="body-a"></p>
+	</div>
+	<div id="size_chart_head_wrap">
+		<div class="size_chart_select_wrap division_select g-1-1 g-lg-1-2">
+			<div class="sizechartDivisionSelector">
+				<span class="currentDivision icon-arrow-down">Select Division</span>
+				<div class="sizechartDropdown divisionDropdown">
+					<ul>
+						<li data-division="womens">Women</li>
+						<li data-division="womens_plus">Women's Plus</li>
+						<li data-division="maternity">Maternity</li>
+						<li data-division="mens">Men</li>
+						<li data-division="girls">Girls</li>
+						<li data-division="boys">Boys</li>
+						<li data-division="baby">Baby</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+		<div class="size_chart_select_wrap categorySelect g-1-1 g-lg-1-2" data-parent="womens" style="display:none">
+			<div class="sizechartCategorySelector">
+				<span class="currentCategory icon-arrow-down">Select Category</span>
+				<div class="sizechartDropdown categoryDropdown">
+					<ul>
+						<li data-category="pants" data-content="womenPants.js">Pants & Jeans</li>
+						<li data-category="shorts" data-content="womenSkirts.js">Shorts & Skirts</li>
+						<li data-category="tops" data-content="womenTops.js">Tops & Outerwear</li>
+						<li data-category="dresses" data-content="womenDresses.js">Dresses</li>
+						<li data-category="belts" data-content="womenBelts.js">Belts</li>
+						<li data-category="shoes" data-content="womenShoes.js">Shoes</li>
+						<li data-category="swim" data-content="womenSwim.js">Swim</li>
+						<li data-category="underwear" data-content="womenUnderwear.js">Underwear</li>
+						<li data-category="bras" data-content="womenBras.js">Bras</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+		<div class="size_chart_select_wrap categorySelect g-1-1 g-lg-1-2" data-parent="mens" style="display:none">
+			<div class="sizechartCategorySelector">
+				<span class="currentCategory icon-arrow-down">Select Category</span>
+				<div class="sizechartDropdown categoryDropdown">
+					<ul>
+						<li data-category="shirts" data-content="menShirts.js">Shirts</li>
+						<li data-category="tees" data-content="menTees.js">Tees</li>
+						<li data-category="outerwear" data-content="menOuterwear.js">Outerwear</li>
+						<li data-category="bottoms" data-content="menBottoms.js">Bottoms</li>
+						<li data-category="underwear" data-content="menUnderwear.js">Underwear</li>
+						<li data-category="belts" data-content="menBelts.js">Belts</li>
+						<li data-category="shoes" data-content="menShoes.js">Shoes</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+		<div class="size_chart_select_wrap categorySelect g-1-1 g-lg-1-2" data-parent="womens_plus" style="display:none">
+			<div class="sizechartCategorySelector">
+				<span class="currentCategory icon-arrow-down">Select Category</span>
+				<div class="sizechartDropdown categoryDropdown">
+					<ul>
+						<li data-category="pants" data-content="womensPlusPants.js">Pants & Jeans</li>
+						<li data-category="shorts" data-content="womensPlusShorts.js">Shorts & Skirts</li>
+						<li data-category="tops" data-content="womensPlusTops.js">Tops & Outerwear</li>
+						<li data-category="dresses" data-content="womensPlusDresses.js">Dresses</li>
+						<li data-category="belts" data-content="womensPlusBelts.js">Belts</li>
+						<li data-category="swim" data-content="womensPlusSwim.js">Swim</li>
+						<li data-category="underwear" data-content="womensPlusUnderwear.js">Underwear</li>
+						<li data-category="bras" data-content="womensPlusBras.js">Bras</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+		<div class="size_chart_select_wrap categorySelect g-1-1 g-lg-1-2" data-parent="maternity" style="display:none">
+			<div class="sizechartCategorySelector">
+				<span class="currentCategory icon-arrow-down">Select Category</span>
+				<div class="sizechartDropdown categoryDropdown">
+					<ul>
+						<li data-category="pants" data-content="maternityPants.js">Pants & Jeans</li>
+						<li data-category="shorts" data-content="maternityShorts.js">Shorts & Skirts</li>
+						<li data-category="tops" data-content="maternityTops.js">Tops & Outerwear</li>
+						<li data-category="dresses" data-content="maternityDresses.js">Dresses</li>
+						<li data-category="swim" data-content="maternitySwim.js">Swim</li>
+						<li data-category="underwear" data-content="maternityUnderwear.js">Underwear</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+		<div class="size_chart_select_wrap categorySelect g-1-1 g-lg-1-2" data-parent="girls" style="display:none">
+			<div class="sizechartCategorySelector">
+				<span class="currentCategory icon-arrow-down">Select Category</span>
+				<div class="sizechartDropdown categoryDropdown">
+					<ul>
+						<li data-category="pants" data-content="girlsPants.js">Pants & Jeans</li>
+						<li data-category="shorts" data-content="girlsShorts.js">Shorts & Skirts</li>
+						<li data-category="tops" data-content="girlsTops.js">Tops & Outerwear</li>
+						<li data-category="dresses" data-content="girlsDresses.js">Dresses</li>
+						<li data-category="belts" data-content="girlsBelts.js">Belts</li>
+						<li data-category="swim" data-content="girlsSwim.js">Swim</li>
+						<li data-category="shoes" data-content="girlsShoes.js">Shoes</li>
+						<li data-category="underwear" data-content="girlsUnderwear.js">Underwear</li>
+						<li data-category="tights" data-content="girlsTights.js">Tights</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+		<div class="size_chart_select_wrap categorySelect g-1-1 g-lg-1-2" data-parent="boys" style="display:none">
+			<div class="sizechartCategorySelector">
+				<span class="currentCategory icon-arrow-down">Select Category</span>
+				<div class="sizechartDropdown categoryDropdown">
+					<ul>
+						<li data-category="bottoms" data-content="boysBottoms.js">Bottoms</li>
+						<li data-category="swim" data-content="boysSwim.js">Swim</li>
+						<li data-category="tops" data-content="boysTops.js">Tops & Outerwear</li>
+						<li data-category="belts" data-content="boysBelts.js">Belts</li>
+						<li data-category="shoes" data-content="boysShoes.js">Shoes</li>
+						<li data-category="underwear" data-content="boysUnderwear.js">Underwear</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+		<div class="size_chart_select_wrap categorySelect g-1-1 g-lg-1-2" data-parent="baby" style="display:none">
+			<div class="sizechartCategorySelector">
+				<span class="currentCategory icon-arrow-down">Select Category</span>
+				<div class="sizechartDropdown categoryDropdown">
+					<ul>
+						<li data-category="apparel" data-content="babyTops.js">Tops & Bottoms</li>
+						<li data-category="hats" data-content="babyHats.js">Hats</li>
+						<li data-category="shoes" data-content="babyShoes.js">Shoes</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div id="size_chart_data_wrap">
+		<div id="size_chart_data_container">
+
+		</div>
+	</div>
+</div>
+
+<!-- CIID:7338580 EN -->
+<div class="scroll" style="margin-left: 5px;">
+	<span class="chartTitle">Toddler Shoes (Numeric) </span>
+
+	<hr>
+	<br>
+	<table width="560" summary="size chart: toddler shoes" class="sizeChartTable">
+		<thead>
+			<tr>
+				<th class="sizeth" scope="col">SIZE</th>
+				<th width="75" scope="col">5</th>
+				<th width="75" scope="col">6</th>
+				<th width="75" scope="col">7</th>
+				<th width="75" scope="col">8</th>
+				<th width="75" scope="col">9</th>
+				<th width="75" scope="col">10</th>
+				<th width="75" scope="col">11</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td class="leftSideHeader">AGE</td>
+				<td>6-12&nbsp;mos.</td>
+				<td>12-18&nbsp;mos.</td>
+				<td>18-24&nbsp;mos.</td>
+				<td>2T</td>
+				<td>3T</td>
+				<td>4T</td>
+				<td>5T</td>
+			</tr>
+			<tr>
+				<td class="leftSideHeader">FOOT LENGTH</td>
+				<td>4 <span class="fractionSize"><span class="super">15</span> / <span class="sub">16</span></span></td>
+				<td>5 <span class="fractionSize"><span class="super">5</span> / <span class="sub">16</span></span></td>
+				<td>5 <span class="fractionSize"><span class="super">5</span> / <span class="sub">8</span></span></td>
+				<td>5 <span class="fractionSize"><span class="super">15</span> / <span class="sub">16</span></span></td>
+				<td>6 <span class="fractionSize"><span class="super">1</span> / <span class="sub">4</span></span></td>
+				<td>6 <span class="fractionSize"><span class="super">9</span> / <span class="sub">16</span></span></td>
+				<td>6 <span class="fractionSize"><span class="super">7</span> / <span class="sub">8</span></span></td>
+			</tr>
+		</tbody>
+	</table>
+	<br>
+	<span class="chartTitle">Toddler Shoes (Alpha) </span>
+
+	<hr>
+	<br>
+	<table width="560" summary="size chart: toddler shoes" class="sizeChartTable">
+		<thead>
+			<tr>
+				<th class="sizeth" scope="col">SIZE</th>
+				<th width="75" scope="col">XS</th>
+				<th width="75" scope="col">S</th>
+				<th width="75" scope="col">M</th>
+				<th width="75" scope="col">L</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td class="leftSideHeader">SHOE SIZE</td>
+				<td>5/6</td>
+				<td>7/8</td>
+				<td>9/10</td>
+				<td>11</td>
+			</tr>
+			<tr>
+				<td class="leftSideHeader">FOOT LENGTH</td>
+				<td>5 <span class="fractionSize"><span class="super">5</span> / <span class="sub">8</span></span></td>
+				<td>6 <span class="fractionSize"><span class="super">3</span> / <span class="sub">8</span></span></td>
+				<td>6 <span class="fractionSize"><span class="super">7</span> / <span class="sub">8</span></span></td>
+				<td>7 <span class="fractionSize"><span class="super">9</span> / <span class="sub">16</span></span></td>
+			</tr>
+		</tbody>
+	</table>
+	<div style="margin-top: 10px; margin-bottom: 10px;"><img style="margin-right: 5px; width: 6px; height: 11px;" alt="" src="/Asset_Archive/ONWeb/content/0002/025/319/assets/download_caret.gif"><span
+			style="color: rgb(73, 125, 178); font-size: 13px;"><a target="_new" href="/Asset_Archive/ONWeb/content/0000/563/739/assets/baby_shoe_chart.pdf">Download a printable measurement
+				chart</a></span><br>
+		<span style="margin-left: 10px; color: rgb(102, 102, 102);">Please note chart does not reflect Newborn Shoe Sizes</span></div>
+
+	<br><br>
+	<span class="chartTitle">Newborn Shoes</span>
+
+	<hr>
+	<br>
+	<table width="450" summary="size chart: newborn shoes" class="sizeChartTable">
+		<thead>
+			<tr>
+				<th rowspan="2" class="sizeth" scope="col">SIZE&nbsp;<span style="font-size: 12px;">(AGE)</span></th>
+				<th width="75" scope="col">0-3 mos.</th>
+				<th width="75" scope="col">3-6 mos.</th>
+				<th width="75" scope="col">6-12 mos.</th>
+				<th width="75" scope="col">12-18 mos.</th>
+				<th width="75" scope="col">18-24 mos.</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td class="leftSideHeader">FOOT LENGTH</td>
+				<td>3<span class="fractionSize"><span class="super">5</span> / <span class="sub">8</span></span></td>
+				<td>3<span class="fractionSize"><span class="super">15</span> / <span class="sub">16</span></span></td>
+				<td>4<span class="fractionSize"><span class="super">5</span> / <span class="sub">16</span></span></td>
+				<td>4<span class="fractionSize"><span class="super">5</span> / <span class="sub">8</span></span></td>
+				<td>5</td>
+			</tr>
+		</tbody>
+	</table>
+	<br>
+	<hr>
+</div>

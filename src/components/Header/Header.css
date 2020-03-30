@@ -1,0 +1,18 @@
+.header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    background: #666;
+    color: white;
+    height: fit-content;
+}
+
+.header-logo {
+    height: 8vh;
+}
+
+.header-title {
+    margin-right: 20px;
+}

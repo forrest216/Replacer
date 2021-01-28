@@ -41,7 +41,7 @@
   "devDependencies": {
     "bootstrap": "^4.4.1",
     "concurrently": "^5.1.0",
-    "electron": "^8.0.1",
+    "electron": "^9.4.0",
     "electron-builder": "^22.3.2",
     "electron-rebuild": "^1.10.0",
     "nodegit": "^0.26.5",
